@@ -1,0 +1,319 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}{{ brand.name }} — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    .brand-page-hero {
+        padding: 4rem 0 2rem;
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+    }
+
+    .brand-page-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+    }
+
+    body.light .brand-page-hero h1 {
+        color: #18181B;
+    }
+
+    .brand-page-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .brand-detail-badge,
+    .brand-detail-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.65rem 1rem;
+        border-radius: 999px;
+        background: rgba(212, 175, 55, 0.12);
+        color: #D4AF37;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .brand-detail-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    @media (min-width: 900px) {
+        .brand-detail-grid {
+            grid-template-columns: 0.65fr 0.35fr;
+        }
+    }
+
+    .brand-sidebar {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .brand-sidebar .brand-logo-wrap {
+        width: 100%;
+        max-width: 380px;
+        aspect-ratio: 1 / 1;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(24, 24, 27, 0.5);
+    }
+
+    .brand-sidebar .brand-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    .brand-sidebar .brand-sum {
+        background: rgba(39, 39, 42, 0.4);
+        border: 1px solid rgba(113, 113, 122, 0.15);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        color: #A1A1AA;
+    }
+
+    .brand-sidebar .brand-sum h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: #E4E4E7;
+    }
+
+    body.light .brand-sidebar .brand-sum {
+        background: rgba(244, 244, 245, 0.4);
+        border-color: rgba(161, 161, 170, 0.15);
+        color: #52525B;
+    }
+
+    .brand-media-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .brand-card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.15);
+        background: rgba(39, 39, 42, 0.4);
+    }
+
+    .brand-card:hover {
+        border-color: rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+        transition: transform 0.25s ease;
+    }
+
+    .brand-card-video,
+    .brand-card-image {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #000;
+        max-height: 420px;
+    }
+
+    .brand-card-video video {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+        background: #000;
+    }
+
+    .brand-card-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+    }
+
+    .brand-card-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+    }
+
+    .brand-card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    .brand-card-body h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 0.75rem;
+    }
+
+    body.light .brand-card-body h3 {
+        color: #18181B;
+    }
+
+    .brand-card-body p {
+        margin: 0;
+        color: #A1A1AA;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .brand-card-body .media-caption {
+        margin-top: 0.75rem;
+        color: #A1A1AA;
+        font-size: 0.9rem;
+    }
+
+    .brand-actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .brand-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.3rem;
+        border-radius: 0.9rem;
+        background: rgba(212, 175, 55, 0.12);
+        color: #D4AF37;
+        text-decoration: none;
+        font-weight: 700;
+        transition: transform 0.2s ease;
+    }
+
+    .brand-actions a:hover {
+        transform: translateY(-1px);
+    }
+
+    .back-link {
+        display: inline-flex;
+        margin-bottom: 1.75rem;
+        color: #A1A1AA;
+        text-decoration: none;
+        gap: 0.5rem;
+    }
+
+    .back-link:hover {
+        color: #D4AF37;
+    }
+
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #A1A1AA;
+        border-radius: 1.25rem;
+        background: rgba(39, 39, 42, 0.3);
+        border: 1px solid rgba(113, 113, 122, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section page-hero brand-page-hero reveal">
+  <div class="container">
+    <a href="{% url 'portfolio:brands' %}" class="back-link">← Brandlar ro'yxatiga qaytish</a>
+    <h1>{{ brand.name }}</h1>
+    <div class="brand-page-meta">
+      <span class="brand-detail-pill">{{ brand.work_label }}</span>
+      <span class="brand-detail-badge">{{ brand.get_category_display }}</span>
+      {% if brand.website %}
+      <a href="{{ brand.website }}" target="_blank" rel="noopener" class="brand-detail-pill">Veb-saytga o'tish</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="container brand-detail-grid">
+  <aside class="brand-sidebar">
+    <div class="brand-logo-wrap reveal-logo">
+      {% if brand.logo %}
+        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">
+      {% else %}
+        <div class="brand-logo-placeholder">{{ brand.name|first }}</div>
+      {% endif %}
+    </div>
+
+    <div class="brand-sum reveal">
+      <h2>Brand haqida</h2>
+      {% if brand.description %}
+        <p>{{ brand.description }}</p>
+      {% else %}
+        <p>Ushbu brand uchun ishlar ro'yxati va media fayllar qulay tarzda ko'rsatiladi.</p>
+      {% endif %}
+    </div>
+
+    {% if brand.latest_video %}
+    <div class="brand-sum reveal">
+      <h2>So'nggi video</h2>
+      <video preload="metadata" controls playsinline
+             style="width:100%; height:auto; object-fit:contain; transition-delay: 0.25s;"
+             class="brand-card-video landscape reveal-logo">
+        <source src="{{ brand.latest_video.video.url }}" type="video/mp4">
+        Sizning brauzeringiz videoni qo'llab-quvvatlamaydi.
+      </video>
+    </div>
+    {% endif %}
+  </aside>
+
+  <main>
+    <div class="brand-actions reveal">
+      <span class="brand-detail-pill">{{ case_studies.count }} ish namunasi</span>
+      <span class="brand-detail-pill">{{ brand.category }}</span>
+    </div>
+
+    <div class="brand-media-grid">
+      {% if case_studies %}
+        {% for cs in case_studies %}
+          {% with first_video=cs.videos.first first_image=cs.images.first %}
+          <article class="brand-card reveal">
+            {% if first_video %}
+            <div class="brand-card-video">
+              <video preload="metadata" controls playsinline>
+                <source src="{{ first_video.video.url }}" type="video/mp4">
+                Sizning brauzeringiz videoni qo'llab-quvvatlamaydi.
+              </video>
+            </div>
+            {% elif first_image %}
+            <div class="brand-card-image">
+              <img src="{{ first_image.image.url }}" alt="{{ cs.title }}" loading="lazy">
+            </div>
+            {% else %}
+            <div class="brand-card-image" style="min-height:220px; display:flex; align-items:center; justify-content:center; color:#D4AF37;">
+              Video yoki rasm mavjud emas
+            </div>
+            {% endif %}
+
+            <div class="brand-card-body">
+              <h3>{{ cs.title }}</h3>
+              {% if cs.description %}
+              <p>{{ cs.description|truncatechars:160 }}</p>
+              {% endif %}
+              {% if first_video and first_video.caption %}
+              <div class="media-caption">{{ first_video.caption }}</div>
+              {% endif %}
+            </div>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>Bu brand uchun hozircha nashr qilingan ishlar mavjud emas.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,523 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Case Study {% if form.instance.pk %}Edit{% else %}Qo'shish{% endif %} — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+        margin-bottom: 0.5rem;
+    }
+    
+    body.light .form-header h1 {
+        color: #18181B;
+    }
+    
+    .form-header p {
+        color: #A1A1AA;
+        font-size: 0.95rem;
+    }
+    
+    body.light .form-header p {
+        color: #71717A;
+    }
+    
+    .form-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+    }
+    
+    body.light .form-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .form-field {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-field:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-field label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #E4E4E7;
+        margin-bottom: 0.6rem;
+    }
+    
+    body.light .form-field label {
+        color: #18181B;
+    }
+    
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border-radius: 0.625rem;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(24, 24, 27, 0.5);
+        color: #E4E4E7;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    body.light .form-field input,
+    body.light .form-field textarea,
+    body.light .form-field select {
+        background: rgba(244, 244, 245, 0.5);
+        color: #18181B;
+    }
+    
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        background: rgba(24, 24, 27, 0.8);
+    }
+    
+    body.light .form-field input:focus,
+    body.light .form-field textarea:focus,
+    body.light .form-field select:focus {
+        background: rgba(244, 244, 245, 0.8);
+    }
+    
+    .form-field textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .form-field input[type="file"] {
+        padding: 0.625rem;
+    }
+    
+    .form-field input[type="checkbox"],
+    .form-field input[type="radio"] {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+    
+    .form-field .help-text {
+        display: block;
+        color: #71717A;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+    }
+    
+    body.light .form-field .help-text {
+        color: #A1A1AA;
+    }
+    
+    .form-field .error {
+        display: block;
+        color: #EF4444;
+        font-size: 0.85rem;
+        margin-top: 0.4rem;
+    }
+    
+    .form-field ul {
+        list-style: none;
+        padding: 0;
+        margin: 0.6rem 0 0 0;
+    }
+    
+    .form-field li {
+        margin-bottom: 0.4rem;
+    }
+    
+    .form-field li input {
+        margin-right: 0.5rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+    }
+    
+    body.light .form-actions {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .btn-primary {
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.625rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-secondary {
+        padding: 0.875rem 2rem;
+        background: rgba(113, 113, 122, 0.1);
+        color: #A1A1AA;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 0.625rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    body.light .btn-secondary {
+        background: rgba(161, 161, 170, 0.1);
+        color: #71717A;
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(113, 113, 122, 0.2);
+        border-color: rgba(113, 113, 122, 0.3);
+    }
+    
+    body.light .btn-secondary:hover {
+        background: rgba(161, 161, 170, 0.2);
+        border-color: rgba(161, 161, 170, 0.3);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .media-section {
+        background: rgba(24, 24, 27, 0.75);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+    }
+
+    body.light .media-section {
+        background: rgba(244, 244, 245, 0.75);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+
+    .media-heading {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 1rem;
+    }
+
+    body.light .media-heading {
+        color: #18181B;
+    }
+
+    .inline-formset-panel {
+        margin-bottom: 2rem;
+    }
+
+    .inline-formset-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .inline-form-heading {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #D4AF37;
+    }
+
+    .inline-form {
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: rgba(39, 39, 42, 0.4);
+    }
+
+    body.light .inline-form {
+        background: rgba(244, 244, 245, 0.4);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+
+    .inline-form .form-field {
+        margin-bottom: 1rem;
+    }
+
+    .compact-delete {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .remove-btn {
+        margin-top: 0.75rem;
+        padding: 0.65rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+    <div class="form-header">
+        <h1>{% if form.instance.pk %}Case Study Tahrir qilish{% else %}Yangi Ish Qo'shish{% endif %}</h1>
+        <p>Video loyihasi ma'lumotlarini kiritib o'tkazun</p>
+    </div>
+    
+    <div class="form-card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-column">
+                    {% for field in form %}
+                        <div class="form-field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <span class="help-text">{{ field.help_text|safe }}</span>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <span class="error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-column">
+                    <div class="media-section">
+                        <h2 class="media-heading">Loyiha multimediasi</h2>
+
+                        <div class="inline-formset-panel">
+                            <div class="inline-formset-header">
+                                <h3>Rasmlar</h3>
+                                <button type="button" class="btn-secondary" onclick="addInlineForm('images', 'images-container')">+ Rasm qo'shish</button>
+                            </div>
+                            {{ image_formset.management_form }}
+                            <div id="images-container">
+                                {% for inline_form in image_formset %}
+                                    <div class="inline-form" data-form-prefix="images">
+                                        <div class="inline-form-heading">Rasm {{ forloop.counter }}</div>
+
+                                        <div class="form-field">
+                                            {{ inline_form.image.label_tag }}
+                                            {{ inline_form.image }}
+                                            {% for error in inline_form.image.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="form-field">
+                                            {{ inline_form.caption.label_tag }}
+                                            {{ inline_form.caption }}
+                                            {% for error in inline_form.caption.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+
+                                        {% if inline_form.instance.pk %}
+                                            <div class="form-field compact-delete">
+                                                {{ inline_form.DELETE }}
+                                                <label>{{ inline_form.DELETE.label }}</label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div id="images-empty-form" class="hidden">
+                                <div class="inline-form" data-form-prefix="images">
+                                    <div class="inline-form-heading">Rasm</div>
+                                    <div class="form-field">
+                                        {{ image_formset.empty_form.image.label_tag }}
+                                        {{ image_formset.empty_form.image }}
+                                    </div>
+                                    <div class="form-field">
+                                        {{ image_formset.empty_form.caption.label_tag }}
+                                        {{ image_formset.empty_form.caption }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="inline-formset-panel">
+                            <div class="inline-formset-header">
+                                <h3>Videolar</h3>
+                                <button type="button" class="btn-secondary" onclick="addInlineForm('videos', 'videos-container')">+ Video qo'shish</button>
+                            </div>
+                            {{ video_formset.management_form }}
+                            <div id="videos-container">
+                                {% for inline_form in video_formset %}
+                                    <div class="inline-form" data-form-prefix="videos">
+                                        <div class="inline-form-heading">Video {{ forloop.counter }}</div>
+
+                                        <div class="form-field">
+                                            {{ inline_form.video.label_tag }}
+                                            {{ inline_form.video }}
+                                            {% for error in inline_form.video.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="form-field">
+                                            {{ inline_form.caption.label_tag }}
+                                            {{ inline_form.caption }}
+                                            {% for error in inline_form.caption.errors %}
+                                                <span class="error">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+
+                                        {% if inline_form.instance.pk %}
+                                            <div class="form-field compact-delete">
+                                                {{ inline_form.DELETE }}
+                                                <label>{{ inline_form.DELETE.label }}</label>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div id="videos-empty-form" class="hidden">
+                                <div class="inline-form" data-form-prefix="videos">
+                                    <div class="inline-form-heading">Video</div>
+                                    <div class="form-field">
+                                        {{ video_formset.empty_form.video.label_tag }}
+                                        {{ video_formset.empty_form.video }}
+                                    </div>
+                                    <div class="form-field">
+                                        {{ video_formset.empty_form.caption.label_tag }}
+                                        {{ video_formset.empty_form.caption }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'portfolio:admin_dashboard' %}" class="btn-secondary">Bekor qilish</a>
+                <button type="submit" class="btn-primary">{% if form.instance.pk %}Yangilash{% else %}Saqlash{% endif %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addInlineForm(prefix, containerId) {
+    const container = document.getElementById(containerId);
+    const totalFormsInput = document.querySelector(`input[name="${prefix}-TOTAL_FORMS"]`);
+    const emptyTemplate = document.getElementById(`${prefix}-empty-form`);
+
+    if (!container || !totalFormsInput || !emptyTemplate) {
+        return;
+    }
+
+    const currentIndex = parseInt(totalFormsInput.value, 10);
+    let newFormHtml = emptyTemplate.innerHTML.replace(/__prefix__/g, currentIndex);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'inline-form';
+    wrapper.dataset.formPrefix = prefix;
+    wrapper.innerHTML = newFormHtml;
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn-secondary remove-btn';
+    removeButton.textContent = '− O‘chirish';
+    removeButton.addEventListener('click', () => removeInlineForm(wrapper, prefix, containerId));
+    wrapper.appendChild(removeButton);
+
+    container.appendChild(wrapper);
+    totalFormsInput.value = currentIndex + 1;
+}
+
+function removeInlineForm(wrapper, prefix, containerId) {
+    const deleteCheckbox = wrapper.querySelector(`input[name$="-DELETE"]`);
+    if (deleteCheckbox) {
+        deleteCheckbox.checked = true;
+        wrapper.style.display = 'none';
+        return;
+    }
+
+    wrapper.remove();
+    updateInlineFormIndices(prefix, containerId);
+}
+
+function updateInlineFormIndices(prefix, containerId) {
+    const container = document.getElementById(containerId);
+    const forms = container.querySelectorAll('.inline-form');
+    const totalFormsInput = document.querySelector(`input[name="${prefix}-TOTAL_FORMS"]`);
+
+    forms.forEach((formEl, index) => {
+        formEl.querySelectorAll('[name]').forEach(input => {
+            input.name = input.name.replace(new RegExp(`${prefix}-\\d+-`, 'g'), `${prefix}-${index}-`);
+        });
+        formEl.querySelectorAll('[id]').forEach(input => {
+            input.id = input.id.replace(new RegExp(`${prefix}-\\d+-`, 'g'), `${prefix}-${index}-`);
+        });
+        formEl.querySelectorAll('label').forEach(label => {
+            if (label.htmlFor) {
+                label.htmlFor = label.htmlFor.replace(new RegExp(`${prefix}-\\d+-`, 'g'), `${prefix}-${index}-`);
+            }
+        });
+    });
+
+    totalFormsInput.value = forms.length;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,936 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}PoW — {{ profile.name|default:"Video Editor" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Hero Section ─── */
+    .hero {
+        padding: 6rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .hero-avatar img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-avatar img {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+    .hero-avatar img {
+        max-width: 260px;
+        }
+    }
+    /* ─── Brands Carousel ─── */
+    .brands-strip {
+        padding: 3rem 0;
+        border-top: 1px solid rgba(113, 113, 122, 0.15);
+        border-bottom: 1px solid rgba(113, 113, 122, 0.15);
+        margin: 2rem 0;
+    }
+
+    body.light .brands-strip {
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+
+    .strip-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #71717A;
+        margin-bottom: 1.25rem;
+        font-weight: 500;
+    }
+
+    .brands-carousel-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    /* Tashqi oyna */
+    .carousel-track-outer {
+        flex: 1;
+        overflow: hidden;
+        min-height: 220px; /* Balandlikni kartalarga moslab biroz qisqartirdik */
+        border-radius: 1.5rem;
+        background: rgba(18, 18, 20, 0.85);
+        border: 1px solid rgba(113, 113, 122, 0.22);
+    }
+
+    body.light .carousel-track-outer {
+        background: rgba(244, 244, 245, 0.88);
+        border-color: rgba(161, 161, 170, 0.35);
+    }
+
+    /* Ichki harakatlanuvchi tasma */
+    .carousel-track {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        will-change: transform;
+        /* JS animatsiyani silliq boshqarishi uchun transition bu yerda qoladi */
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Har bitta brendning to'rtburchak premium kartasi */
+    .carousel-slide {
+        flex-shrink: 0; /* Majburlab siqib qo'ymasligi uchun */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        background: rgba(113, 113, 122, 0.04); /* Kartaga yengil premium fon beramiz */
+        border: 1px dashed rgba(113, 113, 122, 0.2); /* Nuqtali chegara */
+        border-radius: 1rem;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Sichqoncha borgandagi premium effekt */
+    .carousel-slide:hover {
+        background: rgba(255, 209, 67, 0.04);
+        border-color: rgba(255, 209, 67, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* Karta ichidagi rasm */
+    .brand-logo-img {
+        width: 100%;  /* Karta kengligiga moslashadi */
+        height: 100%; /* Karta balandligiga moslashadi */
+        max-height: 110px; /* Rasmni judayam o'sib ketmasligini ta'minlaydi */
+        object-fit: contain;
+        opacity: 0.7;
+        filter: grayscale(20%);
+        transition: opacity 0.4s ease, filter 0.4s ease, transform 0.3s ease;
+    }
+
+    .carousel-slide:hover .brand-logo-img {
+        opacity: 1;
+        filter: none;
+        transform: scale(1.03);
+    }
+
+    /* Rasm bo'lmaganda chiquvchi placeholder */
+    .brand-logo-placeholder {
+        width: 100%;
+        height: 100%;
+        min-height: 110px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(113, 113, 122, 0.08);
+        border-radius: 1rem;
+        border: 1px dashed rgba(255, 209, 67, 0.3);
+        opacity: 0.75;
+        transition: opacity 0.3s ease;
+    }
+
+    .brand-logo-placeholder span {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #F8F0C3;
+        text-align: center;
+        padding: 0 0.75rem;
+        line-height: 1.2;
+    }
+
+    .carousel-slide:hover .brand-logo-placeholder {
+        opacity: 0.95;
+    }
+
+    /* Navigatsiya tugmalari */
+    .carousel-btn {
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 209, 67, 0.35);
+        background: rgba(16, 16, 18, 0.85);
+        color: #F9E77D;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 2;
+    }
+
+    body.light .carousel-btn {
+        background: rgba(255, 255, 255, 0.85);
+        border-color: rgba(161, 161, 170, 0.4);
+        color: #52525B;
+    }
+
+    .carousel-btn:hover {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: rgba(212, 175, 55, 0.5);
+        color: #D4AF37;
+        transform: scale(1.08);
+    }
+
+    .carousel-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Progress dots - buni JS yashirib yuboradi, CSS buzilmasligi uchun qoldi */
+    .carousel-dots {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        margin-top: 0.85rem;
+    }
+
+    .carousel-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(113, 113, 122, 0.35);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        padding: 0;
+    }
+
+    .carousel-dot.active {
+        background: #D4AF37;
+        width: 18px;
+        border-radius: 3px;
+    }
+
+    /* Progress bar liniyasi */
+    .carousel-progress {
+        height: 4px;
+        background: rgba(255, 209, 67, 0.18);
+        border-radius: 999px;
+        margin-top: 0.85rem;
+        overflow: hidden;
+    }
+
+    .carousel-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #FFD54F, #FCD34D);
+        border-radius: 999px;
+        transition: width 0.1s linear;
+        width: 0%;
+    }
+
+    /* Mobil qurilmalar uchun moslashuvchanlik (Responsive) */
+    @media (max-width: 640px) {
+        .carousel-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 0.9rem;
+        }
+        .carousel-track-outer {
+            min-height: 140px;
+        }
+        .carousel-slide {
+            padding: 0.5rem;
+        }
+        .brand-logo-img, .brand-logo-placeholder {
+            max-height: 70px;
+        }
+    }
+    
+    /* ─── Section Styling ─── */
+    .section {
+        padding: 6rem 0;
+    }
+    
+    .section-label {
+        display: block;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #D4AF37;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 3rem;
+        color: var(--text);
+    }
+    
+    body.light .section-title {
+        color: var(--text);
+    }
+    
+    .section-dark {
+        background: rgba(24, 24, 27, 0.5);
+        border-top: 1px solid rgba(113, 113, 122, 0.1);
+        border-bottom: 1px solid rgba(113, 113, 122, 0.1);
+    }
+    
+    body.light .section-dark {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.1);
+    }
+    
+    /* ─── About Section ─── */
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 4rem;
+        align-items: start;
+    }
+    
+    @media (max-width: 968px) {
+        .about-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .about-bio {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-dim);
+        margin-bottom: 2rem;
+    }
+    
+    body.light .about-bio {
+        color: var(--text-dim);
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .stat-num {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gold);
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ─── Skills Box ─── */
+    .skills-box {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+    
+    body.light .skills-box {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 30px var(--shadow);
+    }
+    
+    .skills-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--text);
+    }
+    
+    body.light .skills-title {
+        color: var(--text);
+    }
+    
+    .skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(166, 124, 30, 0.12);
+        color: var(--gold);
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid rgba(166, 124, 30, 0.2);
+    }
+    
+    .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+        padding-top: 1.5rem;
+    }
+    
+    body.light .contact-links {
+        border-top-color: var(--border);
+    }
+    
+    .contact-link {
+        color: var(--gold);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-link:hover {
+        transform: translateX(4px);
+        color: #E9C85F;
+    }
+    
+    .contact-link::before {
+        content: '→';
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .contact-link:hover::before {
+        opacity: 1;
+    }
+    
+    /* ─── Works Grid ─── */
+    .works-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .work-card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        group: 'card';
+    }
+    
+    .work-card:hover {
+        transform: translateY(-8px);
+    }
+    
+    .work-thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: rgba(39, 39, 42, 0.5);
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    body.light .work-thumb {
+        background: rgba(244, 244, 245, 0.65);
+        border-color: rgba(161, 161, 170, 0.4);
+    }
+    
+    .work-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .work-card:hover .work-thumb img {
+        transform: scale(1.05);
+    }
+    
+    .work-thumb-placeholder {
+        font-size: 3rem;
+        color: #71717A;
+    }
+    
+    .work-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .work-card:hover .work-overlay {
+        opacity: 1;
+    }
+    
+    .work-overlay span {
+        color: #D4AF37;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .work-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .work-brand {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #D4AF37;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .work-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--text);
+        line-height: 1.4;
+    }
+    
+    body.light .work-title {
+        color: var(--text);
+    }
+    
+    .work-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--text-muted);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    /* ─── Section CTA ─── */
+    .section-cta {
+        text-align: center;
+        margin-top: 3rem;
+    }
+    
+    .btn-primary, .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        font-size: 1rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-ghost {
+        background: transparent;
+        color: #D4AF37;
+        border: 1px solid #D4AF37;
+    }
+    
+    .btn-ghost:hover {
+        background: rgba(212, 175, 55, 0.1);
+    }
+    
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+        }
+        
+        .works-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ─── Hero Section ─── -->
+<section class="hero reveal">
+    <div class="container hero-inner">
+        <div class="hero-text">
+            <p class="hero-eyebrow">Video Editor · Montajor</p>
+            <h1 class="hero-title">
+                {% if profile %}{{ profile.name }}{% else %}Ismingiz{% endif %}
+            </h1>
+            <p class="hero-tagline">
+                {% if profile %}{{ profile.tagline }}{% else %}Premium video kontenti yaratuvchi{% endif %}
+            </p>
+            <div class="hero-actions">
+                <a href="{% url 'portfolio:brands' %}" class="btn-primary">Ishlarni ko'rish</a>
+                <a href="#about" class="btn-ghost">Haqimda</a>
+            </div>
+        </div>
+        {% if profile and profile.avatar %}
+        <div class="hero-avatar">
+            <img src="{{ profile.avatar.url }}" alt="{{ profile.name }}" loading="lazy">
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ─── Featured Brands Strip ─── -->
+{% if all_brands %}
+<section class="brands-strip reveal" id="brands-carousel-section">
+    <div class="container">
+        <p class="strip-label">Ishlagan brandlar</p>
+        <div class="brands-carousel-wrapper">
+            <!-- Prev button -->
+            <button class="carousel-btn" id="brandPrev" aria-label="Oldingi">
+                &#8249;
+            </button>
+
+            <!-- Track -->
+            <div class="carousel-track-outer" id="brandTrackOuter">
+                <div class="carousel-track" id="brandTrack">
+                    {% for brand in all_brands %}
+                    <a class="carousel-slide" href="{% url 'portfolio:brand_detail' brand.pk %}">
+                        {% if brand.logo %}
+                            <img class="brand-logo-img" src="{{ brand.logo.url }}" alt="{{ brand.name }}" loading="lazy">
+                        {% else %}
+                            <div class="brand-logo-placeholder">
+                                <span>{{ brand.name }}</span>
+                            </div>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Next button -->
+            <button class="carousel-btn" id="brandNext" aria-label="Keyingi">
+                &#8250;
+            </button>
+        </div>
+
+        <!-- Dots -->
+        <div class="carousel-dots" id="brandDots"></div>
+
+        <!-- Progress bar -->
+        <div class="carousel-progress">
+            <div class="carousel-progress-bar" id="brandProgressBar"></div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+(function () {
+    const track       = document.getElementById('brandTrack');
+    const outer       = document.getElementById('brandTrackOuter');
+    const prevBtn     = document.getElementById('brandPrev');
+    const nextBtn     = document.getElementById('brandNext');
+    const dotsWrap    = document.getElementById('brandDots');
+    const progressBar = document.getElementById('brandProgressBar');
+
+    if (!track) return;
+
+    // Pastdagi keraksiz dots (nuqtalar)ni butunlay yo'qotamiz
+    if (dotsWrap) {
+        dotsWrap.innerHTML = '';
+        dotsWrap.style.display = 'none';
+    }
+
+    // 1. Django bazadan kelgan original brendlarni olamiz
+    const originalSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+    const totalOriginal  = originalSlides.length;
+    if (totalOriginal === 0) return;
+
+    // 2. AVTOMATLASHTIRISH: Cheksiz zanjir uchun elementlarni 2 marta dublikat qilamiz
+    originalSlides.forEach(slide => {
+        const clone = slide.cloneNode(true);
+        track.appendChild(clone);
+    });
+
+    const INTERVAL_MS = 3000; // Har 3 soniyada avtomat surilishi
+    const GAP         = 32;   // Elementlar orasidagi masofa (px)
+    let currentIndex  = 0;
+    let timer         = null;
+    let progressTimer = null;
+    let progressVal   = 0;
+
+    // Ekranda doim maksimal 5 ta to'rtburchak brend tursin (Agar kam bo'lsa boricha)
+    function visibleCount() {
+        return Math.min(totalOriginal, 5);
+    }
+
+    function slideWidth() {
+        const count = visibleCount();
+        if (count <= 1) return outer.offsetWidth;
+        return (outer.offsetWidth - (GAP * (count - 1))) / count;
+    }
+
+    function setSlideSizes() {
+        const w = slideWidth();
+        const allSlides = track.querySelectorAll('.carousel-slide');
+        allSlides.forEach(s => {
+            s.style.flexBasis = w + 'px';
+            s.style.minWidth  = w + 'px';
+        });
+        track.style.gap = GAP + 'px';
+        updatePosition(false);
+    }
+
+    function updatePosition(animate = true) {
+        const w = slideWidth();
+        if (animate) {
+            track.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        } else {
+            track.style.transition = 'none';
+        }
+        // O'ngga harakatlanish mantiqi uchun minus offset
+        const offset = currentIndex * (w + GAP);
+        track.style.transform = `translateX(-${offset}px)`;
+    }
+
+    // O'NGGA SILLIQ SILJISH (Go Next)
+    function goNext() {
+        currentIndex++;
+        updatePosition(true);
+
+        // Agar zanjir oxiriga (dublikat qismiga) yetsa, sezdirmasdan boshiga qaytadi
+        if (currentIndex >= totalOriginal) {
+            setTimeout(() => {
+                currentIndex = 0;
+                updatePosition(false);
+            }, 500); // 0.5s animatsiya tugashi bilan
+        }
+        resetProgress();
+    }
+
+    // CHAPGA SILJISH (Go Prev)
+    function goPrev() {
+        if (currentIndex <= 0) {
+            currentIndex = totalOriginal;
+            updatePosition(false);
+            setTimeout(() => {
+                currentIndex--;
+                updatePosition(true);
+            }, 10);
+        } else {
+            currentIndex--;
+            updatePosition(true);
+        }
+        resetProgress();
+    }
+
+    /* ── Progress Bar Liniyasi ── */
+    function resetProgress() {
+        if (!progressBar) return;
+        clearInterval(progressTimer);
+        progressVal = 0;
+        progressBar.style.width = '0%';
+        progressTimer = setInterval(() => {
+            progressVal += 100 / (INTERVAL_MS / 100);
+            progressBar.style.width = Math.min(progressVal, 100) + '%';
+        }, 100);
+    }
+
+    function startAuto() {
+        clearInterval(timer);
+        timer = setInterval(goNext, INTERVAL_MS);
+        resetProgress();
+    }
+
+    function stopAuto() {
+        clearInterval(timer);
+        clearInterval(progressTimer);
+    }
+
+    /* ── Tugmalar hodisalari (Click) ── */
+    if (prevBtn) prevBtn.addEventListener('click', () => { stopAuto(); goPrev(); startAuto(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { stopAuto(); goNext(); startAuto(); });
+
+    /* ── Hover bo'lganda to'xtash ── */
+    outer.addEventListener('mouseenter', stopAuto);
+    outer.addEventListener('mouseleave', startAuto);
+
+    /* ── Oyna o'zgarganda (Resize) ── */
+    window.addEventListener('resize', () => {
+        setSlideSizes();
+    });
+
+    // Ishga tushirish (Init)
+    setSlideSizes();
+    startAuto();
+})();
+</script>
+
+{% block extra_js %}{% endblock %}
+
+<!-- ─── About Section ─── -->
+<section class="section reveal" id="about">
+    <div class="container about-grid">
+        <div class="about-text">
+            <span class="section-label">Haqimda</span>
+            <h2 class="section-title">
+                {% if profile %}{{ profile.name }}{% else %}Mening haqimda{% endif %}
+            </h2>
+            {% if profile %}
+                <p class="about-bio">{{ profile.bio }}</p>
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="stat-num">{{ profile.years_experience }}+</span>
+                        <span class="stat-label">Yil tajriba</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-num">{{ brand_count|default:"0" }}+</span>
+                        <span class="stat-label">Mijoz brand</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-num">{{ work_count|default:"0" }}+</span>
+                        <span class="stat-label">Yakunlangan loyiha</span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="about-bio">Profil hozircha tayyorlanmagan. Iltimos, keyinroq qayta urining.</p>
+            {% endif %}
+        </div>
+        {% if profile %}
+        <div class="skills-box">
+            <h3 class="skills-title">Ko'nikmalar</h3>
+            <div class="skills-grid">
+                {% if profile.get_skills_list %}
+                    {% for skill in profile.get_skills_list %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="skill-tag">Video Editing</span>
+                {% endif %}
+            </div>
+            <div class="contact-links">
+                {% if profile.instagram %}<a href="{{ profile.instagram }}" class="contact-link" target="_blank" rel="noopener noreferrer">Instagram</a>{% endif %}
+                {% if profile.telegram %}<a href="{{ profile.telegram }}" class="contact-link" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}
+                {% if profile.youtube %}<a href="{{ profile.youtube }}" class="contact-link" target="_blank" rel="noopener noreferrer">YouTube</a>{% endif %}
+                {% if profile.linkedin %}<a href="{{ profile.linkedin }}" class="contact-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>{% endif %}
+                {% if profile.email %}<a href="mailto:{{ profile.email }}" class="contact-link">Email</a>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ─── Recent Works Section ─── -->
+{% if recent_works %}
+<section class="section section-dark reveal" id="works">
+    <div class="container">
+        <span class="section-label">Portfolio</span>
+        <h2 class="section-title">So'nggi ishlar</h2>
+        <div class="works-grid">
+            {% for work in recent_works %}
+            <a href="{% url 'portfolio:case_study_detail' work.pk %}" class="work-card reveal">
+                <div class="work-thumb">
+                    {% if work.thumbnail %}
+                        <img src="{{ work.thumbnail.url }}" alt="{{ work.title }}" loading="lazy">
+                    {% else %}
+                        {% with first_image=work.images.all|first %}
+                            {% if first_image %}
+                                <img src="{{ first_image.image.url }}" alt="{{ work.title }}" loading="lazy">
+                            {% else %}
+                                <div class="work-thumb-placeholder">▶️</div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    <div class="work-overlay">
+                        <span>Ko'rish →</span>
+                    </div>
+                </div>
+                <div class="work-info">
+                    <span class="work-brand">{{ work.brand.name }}</span>
+                    <h3 class="work-title">{{ work.title }}</h3>
+                    <div class="work-tags">
+                        {% for tag in work.get_tags_list %}
+                            <span class="tag">{{ tag }}</span>
+                        {% empty %}
+                            <span class="tag">Video</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% if brand_count > 0 %}
+        <div class="section-cta">
+            <a href="{% url 'portfolio:brands' %}" class="btn-primary">Barcha brandlarni ko'rish</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

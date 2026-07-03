@@ -1,0 +1,252 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Brand {% if form.instance.pk %}Edit{% else %}Qo'shish{% endif %} — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+        margin-bottom: 0.5rem;
+    }
+    
+    body.light .form-header h1 {
+        color: #18181B;
+    }
+    
+    .form-header p {
+        color: #A1A1AA;
+        font-size: 0.95rem;
+    }
+    
+    body.light .form-header p {
+        color: #71717A;
+    }
+    
+    .form-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+    }
+    
+    body.light .form-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .form-field {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-field:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-field label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #E4E4E7;
+        margin-bottom: 0.6rem;
+    }
+    
+    body.light .form-field label {
+        color: #18181B;
+    }
+    
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border-radius: 0.625rem;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(24, 24, 27, 0.5);
+        color: #E4E4E7;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    body.light .form-field input,
+    body.light .form-field textarea,
+    body.light .form-field select {
+        background: rgba(244, 244, 245, 0.5);
+        color: #18181B;
+    }
+    
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        background: rgba(24, 24, 27, 0.8);
+    }
+    
+    body.light .form-field input:focus,
+    body.light .form-field textarea:focus,
+    body.light .form-field select:focus {
+        background: rgba(244, 244, 245, 0.8);
+    }
+    
+    .form-field textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .form-field input[type="file"] {
+        padding: 0.625rem;
+    }
+    
+    .form-field input[type="checkbox"],
+    .form-field input[type="radio"] {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+    
+    .form-field .help-text {
+        display: block;
+        color: #71717A;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+    }
+    
+    body.light .form-field .help-text {
+        color: #A1A1AA;
+    }
+    
+    .form-field .error {
+        display: block;
+        color: #EF4444;
+        font-size: 0.85rem;
+        margin-top: 0.4rem;
+    }
+    
+    .form-field ul {
+        list-style: none;
+        padding: 0;
+        margin: 0.6rem 0 0 0;
+    }
+    
+    .form-field li {
+        margin-bottom: 0.4rem;
+    }
+    
+    .form-field li input {
+        margin-right: 0.5rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+    }
+    
+    body.light .form-actions {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .btn-primary {
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.625rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-secondary {
+        padding: 0.875rem 2rem;
+        background: rgba(113, 113, 122, 0.1);
+        color: #A1A1AA;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 0.625rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    body.light .btn-secondary {
+        background: rgba(161, 161, 170, 0.1);
+        color: #71717A;
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(113, 113, 122, 0.2);
+        border-color: rgba(113, 113, 122, 0.3);
+    }
+    
+    body.light .btn-secondary:hover {
+        background: rgba(161, 161, 170, 0.2);
+        border-color: rgba(161, 161, 170, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+    <div class="form-header">
+        <h1>{% if form.instance.pk %}Brand Tahrir qilish{% else %}Yangi Brand Qo'shish{% endif %}</h1>
+        <p>Brand ma'lumotlarini kiritib o'tkazun</p>
+    </div>
+    
+    <div class="form-card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <span class="help-text">{{ field.help_text|safe }}</span>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span class="error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <a href="{% url 'portfolio:admin_dashboard' %}" class="btn-secondary">Bekor qilish</a>
+                <button type="submit" class="btn-primary">{% if form.instance.pk %}Yangilash{% else %}Saqlash{% endif %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

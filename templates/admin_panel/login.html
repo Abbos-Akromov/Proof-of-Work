@@ -1,0 +1,184 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Login — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 6rem 1.5rem;
+    }
+    
+    .auth-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        padding: 2.5rem;
+    }
+    
+    body.light .auth-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .auth-subtitle {
+        text-align: center;
+        color: #A1A1AA;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    body.light .auth-subtitle {
+        color: #71717A;
+    }
+    
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .form-field label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #E4E4E7;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    body.light .form-field label {
+        color: #18181B;
+    }
+    
+    .form-field input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(39, 39, 42, 0.8);
+        color: #E4E4E7;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .form-field input {
+        background: rgba(244, 244, 245, 0.8);
+        color: #18181B;
+    }
+    
+    .form-field input:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-field input::placeholder {
+        color: #71717A;
+    }
+    
+    .auth-button {
+        width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+    
+    .auth-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    .auth-button:active {
+        transform: translateY(0);
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+    }
+    
+    body.light .auth-links {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .auth-links p {
+        color: #A1A1AA;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    body.light .auth-links p {
+        color: #71717A;
+    }
+    
+    .auth-links a {
+        color: #D4AF37;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-links a:hover {
+        color: #E9C85F;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">PoW</h1>
+        <p class="auth-subtitle">Proof of Work — Tizimga kirish</p>
+        
+        {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for message in messages %}
+                    <div style="padding: 0.875rem; border-radius: 0.5rem; border-left: 3px solid; margin-bottom: 0.75rem; font-size: 0.9rem; {% if 'success' in message.tags %}background: rgba(16, 185, 129, 0.1); border-left-color: #10B981; color: #10B981;{% elif 'error' in message.tags %}background: rgba(239, 68, 68, 0.1); border-left-color: #EF4444; color: #EF4444;{% else %}background: rgba(59, 130, 246, 0.1); border-left-color: #3B82F6; color: #93C5FD;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-field">
+                <label for="username">Foydalanuvchi nomi</label>
+                <input type="text" id="username" name="username" placeholder="admin" required autofocus>
+            </div>
+            
+            <div class="form-field">
+                <label for="password">Parol</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="auth-button">Tizimga kirish</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>Hisobingiz yo'qmi? <a href="{% url 'portfolio:custom_register' %}">Ro'yxatdan o'tish</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

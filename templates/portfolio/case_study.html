@@ -1,0 +1,419 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}{{ case.title }} — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Page Header ─── */
+    .case-header {
+        background: rgba(24, 24, 27, 0.5);
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+    
+    body.light .case-header {
+        background: rgba(244, 244, 245, 0.5);
+        border-bottom-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .case-header-content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+        margin-bottom: 1rem;
+    }
+    
+    body.light .case-header-content h1 {
+        color: #18181B;
+    }
+    
+    .case-header-meta {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .case-header-meta .badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 0.5rem;
+        color: #D4AF37;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .case-header-meta .brand-link {
+        color: #A1A1AA;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .case-header-meta .brand-link:hover {
+        color: #D4AF37;
+    }
+    
+    /* ─── Main Video Section ─── */
+    .video-section {
+        margin-bottom: 4rem;
+    }
+    
+    .video-section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #D4AF37;
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 1.5rem;
+    }
+    
+    .video-player-container {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: #000;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    
+    body.light .video-player-container {
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .video-player-container video {
+        width: 100%;
+        height: auto;
+        display: block;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        object-fit: cover;
+    }
+
+    .media-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin-bottom: 3rem;
+    }
+
+    .media-card {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(39, 39, 42, 0.4);
+    }
+
+    body.light .media-card {
+        background: rgba(244, 244, 245, 0.4);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+
+    .media-content {
+        width: 100%;
+        min-height: 220px;
+        max-height: 420px;
+        overflow: hidden;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .media-content img,
+    .media-content video {
+        max-width: 100%;
+        max-height: 420px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        background: transparent;
+    }
+
+    .media-caption {
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        color: #A1A1AA;
+        background: rgba(24, 24, 27, 0.85);
+    }
+
+    body.light .media-caption {
+        color: #52525B;
+        background: rgba(244, 244, 245, 0.85);
+    }
+
+    .empty-media {
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #D4AF37;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+    }
+    
+    /* ─── Case Description Section ─── */
+    .case-description {
+        background: rgba(39, 39, 42, 0.3);
+        border: 1px solid rgba(113, 113, 122, 0.15);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    body.light .case-description {
+        background: rgba(244, 244, 245, 0.3);
+        border-color: rgba(161, 161, 170, 0.15);
+    }
+    
+    .case-description h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 1rem;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    body.light .case-description h2 {
+        color: #18181B;
+    }
+    
+    .case-description p {
+        color: #A1A1AA;
+        line-height: 1.8;
+        font-size: 1rem;
+    }
+    
+    body.light .case-description p {
+        color: #71717A;
+    }
+    
+    .case-description p + p {
+        margin-top: 1rem;
+    }
+    
+    /* ─── Tags Section ─── */
+    .case-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .tag {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 0.5rem;
+        color: #D4AF37;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ─── Related Works Section ─── */
+    .related-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+    }
+    
+    body.light .related-section {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .related-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 2rem;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    body.light .related-section h2 {
+        color: #18181B;
+    }
+    
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 640px) {
+        .related-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .related-card {
+        group relative overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 text-decoration-none transition-all duration-300 hover:border-gold hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-1;
+    }
+    
+    .related-card:hover {
+        border-color: rgba(212, 175, 55, 0.3);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+    }
+    
+    .related-thumb {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .related-body {
+        padding: 1.25rem;
+    }
+    
+    .related-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 0.75rem;
+    }
+    
+    body.light .related-title {
+        color: #18181B;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #A1A1AA;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: color 0.3s ease;
+    }
+    
+    .back-link:hover {
+        color: #D4AF37;
+    }
+    
+    body.light .back-link {
+        color: #71717A;
+    }
+    
+    body.light .back-link:hover {
+        color: #D4AF37;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'portfolio:brands' %}" class="back-link" style="display: inline-flex; margin-left: 0; margin-top: 2rem;">
+    ← Brandlar ro'yxatiga qaytish
+</a>
+
+<div class="case-header">
+    <div class="container">
+        <div class="case-header-content">
+            <h1>{{ case.title }}</h1>
+            <div class="case-header-meta">
+                <a href="{% url 'portfolio:case_study_detail' case.pk %}" class="brand-link">
+                    🏢 {{ case.brand.name }}
+                </a>
+                <span class="badge">{{ case.brand.get_category_display }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- ─── Media Gallery ─── -->
+    <div class="video-section">
+        <h2 class="video-section-title">Loyiha media galereyasi</h2>
+        <div class="media-grid">
+            {% if videos or images %}
+                {% for video in videos %}
+                    <div class="media-card">
+                        <div class="media-content">
+                            <video preload="metadata" controls playsinline class="media-player">
+                                <source src="{{ video.video.url }}" type="video/mp4">
+                                Sizning brauzeringiz videoni qo'llab-quvvatlamaydi.
+                            </video>
+                        </div>
+                        {% if video.caption %}
+                            <div class="media-caption">{{ video.caption }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                {% for image in images %}
+                    <div class="media-card">
+                        <div class="media-content">
+                            <img src="{{ image.image.url }}" alt="{{ case.title }}" loading="lazy" class="media-image">
+                        </div>
+                        {% if image.caption %}
+                            <div class="media-caption">{{ image.caption }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="media-card">
+                    <div class="media-content empty-media">
+                        <div style="text-align:center;">
+                            <p style="font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; color:#D4AF37;">Ish hali mavjud emas</p>
+                            <p style="margin:0; color:#A1A1AA;">Bu loyihaga video yoki rasm qo'shilmagan.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ─── Case Description ─── -->
+    {% if case.description %}
+    <div class="case-description">
+        <h2>Loyiha Tavsifi</h2>
+        <p>{{ case.description }}</p>
+    </div>
+    {% endif %}
+
+    <!-- ─── Tags ─── -->
+    {% if case.tags %}
+    <div style="margin-bottom: 3rem;">
+        <h3 style="font-size: 0.95rem; font-weight: 600; color: #D4AF37; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Teglar</h3>
+        <div class="case-tags">
+            {% for tag in case.get_tags_list %}
+                <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ─── Related Works from Same Brand ─── -->
+    {% if related_works %}
+    <div class="related-section">
+        <h2>{{ case.brand.name }}dan Boshqa Ishlar</h2>
+        <div class="related-grid">
+            {% for work in related_works %}
+                <a href="{% url 'portfolio:case_study_detail' work.pk %}" class="related-card" style="text-decoration: none;">
+                    {% if work.thumbnail %}
+                        <img src="{{ work.thumbnail.url }}" alt="{{ work.title }}" class="related-thumb">
+                    {% else %}
+                        <div class="related-thumb" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05)); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #D4AF37;">▶</div>
+                    {% endif %}
+                    <div class="related-body">
+                        <div class="related-title">{{ work.title }}</div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

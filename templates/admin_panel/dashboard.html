@@ -1,0 +1,804 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Dashboard — PoW Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Dashboard Layout ─── */
+    .dashboard-header {
+        background: rgba(24, 24, 27, 0.5);
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    body.light .dashboard-header {
+        background: rgba(244, 244, 245, 0.5);
+        border-bottom-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .dashboard-title {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 1rem;
+    }
+    
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .stat-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .stat-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .stat-card:hover {
+        border-color: #D4AF37;
+        transform: translateY(-2px);
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #71717A;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #D4AF37;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    /* ─── Tab Navigation ─── */
+    .tab-nav {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    body.light .tab-nav {
+        border-bottom-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .tab-btn {
+        padding: 1rem 1.5rem;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #71717A;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    body.light .tab-btn {
+        color: #A1A1AA;
+    }
+    
+    .tab-btn.active {
+        color: #D4AF37;
+        border-bottom-color: #D4AF37;
+    }
+    
+    .tab-btn:hover:not(.active) {
+        color: #A1A1AA;
+    }
+    
+    /* ─── Tab Content ─── */
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ─── Form Styling ─── */
+    .form-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 800px;
+    }
+    
+    body.light .form-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .form-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+    
+    @media (max-width: 640px) {
+        .form-group {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-field label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #E4E4E7;
+    }
+    
+    body.light .form-field label {
+        color: #18181B;
+    }
+    
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(39, 39, 42, 0.5);
+        color: #E4E4E7;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .form-field input,
+    body.light .form-field textarea,
+    body.light .form-field select {
+        background: rgba(244, 244, 245, 0.5);
+        color: #18181B;
+    }
+    
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-field textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .form-field .error {
+        color: #EF4444;
+        font-size: 0.85rem;
+    }
+    
+    .form-field .help-text {
+        color: #71717A;
+        font-size: 0.85rem;
+    }
+    
+    .form-actions {
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+        padding-top: 1.5rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    
+    body.light .form-actions {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .btn-save {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* ─── Table Styling ─── */
+    .table-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    
+    body.light .table-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .table-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    body.light .table-header {
+        border-bottom-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .table-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .btn-add {
+        padding: 0.625rem 1.25rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table thead {
+        background: rgba(24, 24, 27, 0.5);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #71717A;
+    }
+    
+    body.light table thead {
+        background: rgba(244, 244, 245, 0.5);
+    }
+    
+    table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+    }
+    
+    table td {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.1);
+        color: #A1A1AA;
+    }
+    
+    body.light table td {
+        color: #71717A;
+    }
+    
+    table tbody tr:hover {
+        background: rgba(212, 175, 55, 0.05);
+    }
+    
+    /* ─── Action Buttons ─── */
+    .btn-edit, .btn-delete {
+        padding: 0.4rem 0.8rem;
+        border: 1px solid;
+        border-radius: 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-edit {
+        border-color: rgba(212, 175, 55, 0.3);
+        color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+    }
+    
+    .btn-edit:hover {
+        border-color: #D4AF37;
+        background: rgba(212, 175, 55, 0.2);
+    }
+    
+    .btn-delete {
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #EF4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+    
+    .btn-delete:hover {
+        border-color: #EF4444;
+        background: rgba(239, 68, 68, 0.2);
+    }
+    
+    /* ─── Status Badge ─── */
+    .badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid;
+    }
+    
+    .badge-featured {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: rgba(212, 175, 55, 0.3);
+        color: #D4AF37;
+    }
+    
+    .badge-published {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+        color: #10B981;
+    }
+    
+    .badge-hidden {
+        background: rgba(113, 113, 122, 0.15);
+        border-color: rgba(113, 113, 122, 0.3);
+        color: #71717A;
+    }
+    
+    /* ─── Empty State ─── */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #71717A;
+    }
+    
+    .empty-state p {
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-header">
+    <div class="container">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p style="color: #A1A1AA; margin: 0;">Portfolio va brand ma'lumotlarini boshqarish</p>
+    </div>
+</section>
+
+<section class="container">
+    {% if messages %}
+        <div style="margin-bottom: 2rem;">
+            {% for message in messages %}
+                <div style="padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border-left: 4px solid; {% if 'success' in message.tags %}background: rgba(16, 185, 129, 0.1); border-left-color: #10B981; color: #10B981;{% else %}background: rgba(239, 68, 68, 0.1); border-left-color: #EF4444; color: #EF4444;{% endif %} font-weight: 500;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Brands</div>
+            <div class="stat-value">{{ brand_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Published Works</div>
+            <div class="stat-value">{{ work_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">System Status</div>
+            <div class="stat-value" style="color: #10B981;">●</div>
+        </div>
+    </div>
+</section>
+
+<section class="container">
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(event, 'profile')">
+            Profilni tahrirlash
+        </button>
+        <button class="tab-btn" onclick="switchTab(event, 'brands')">
+            Brendlarni boshqarish
+        </button>
+        <button class="tab-btn" onclick="switchTab(event, 'works')">
+            Ishlarni boshqarish
+        </button>
+        {% if request.user.is_superuser %}
+        <button class="tab-btn" onclick="switchTab(event, 'users')">
+            Foydalanuvchilar
+        </button>
+        {% endif %}
+    </div>
+</section>
+
+<div class="container">
+    <div id="profile" class="tab-content active">
+        <div class="form-card">
+            <h2 style="margin: 0 0 1.5rem 0; font-size: 1.5rem; font-weight: 700;">Update Profile Information</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="update_profile" value="1">
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="{{ profile_form.name.id_for_label }}">{{ profile_form.name.label }}</label>
+                        {{ profile_form.name }}
+                        {% for error in profile_form.name.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ profile_form.tagline.id_for_label }}">{{ profile_form.tagline.label }}</label>
+                        {{ profile_form.tagline }}
+                        {% for error in profile_form.tagline.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <div class="form-field">
+                        <label for="{{ profile_form.bio.id_for_label }}">{{ profile_form.bio.label }}</label>
+                        {{ profile_form.bio }}
+                        {% for error in profile_form.bio.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="{{ profile_form.years_experience.id_for_label }}">{{ profile_form.years_experience.label }}</label>
+                        {{ profile_form.years_experience }}
+                        {% for error in profile_form.years_experience.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ profile_form.avatar.id_for_label }}">{{ profile_form.avatar.label }}</label>
+                        {{ profile_form.avatar }}
+                        {% for error in profile_form.avatar.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="{{ profile_form.email.id_for_label }}">{{ profile_form.email.label }}</label>
+                        {{ profile_form.email }}
+                        {% for error in profile_form.email.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ profile_form.instagram.id_for_label }}">{{ profile_form.instagram.label }}</label>
+                        {{ profile_form.instagram }}
+                        {% for error in profile_form.instagram.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="{{ profile_form.telegram.id_for_label }}">{{ profile_form.telegram.label }}</label>
+                        {{ profile_form.telegram }}
+                        {% for error in profile_form.telegram.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ profile_form.youtube.id_for_label }}">{{ profile_form.youtube.label }}</label>
+                        {{ profile_form.youtube }}
+                        {% for error in profile_form.youtube.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="{{ profile_form.linkedin.id_for_label }}">{{ profile_form.linkedin.label }}</label>
+                        {{ profile_form.linkedin }}
+                        {% for error in profile_form.linkedin.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <div class="form-field">
+                        <label for="{{ profile_form.skills.id_for_label }}">{{ profile_form.skills.label }}</label>
+                        {{ profile_form.skills }}
+                        {% if profile_form.skills.help_text %}
+                            <span class="help-text">{{ profile_form.skills.help_text }}</span>
+                        {% endif %}
+                        {% for error in profile_form.skills.errors %}
+                            <span class="error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    {% if request.user.is_superuser %}
+                        <button type="submit" class="btn-save">💾 Save Changes</button>
+                    {% else %}
+                        <span class="help-text">Siz faqat ko'rishingiz mumkin. Tahrirlash huquqi yo'q.</span>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="brands" class="tab-content">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Brands</h3>
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'portfolio:brand_create' %}" class="btn-add">+ Add Brand</a>
+                {% endif %}
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Brand Name</th>
+                            <th>Category</th>
+                            <th>Label</th>
+                            <th>Featured</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for brand in brands %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ brand.name }}</td>
+                                <td>{{ brand.get_category_display }}</td>
+                                <td style="font-size: 0.9rem;">{{ brand.work_label }}</td>
+                                <td>
+                                    {% if brand.is_featured %}
+                                        <span class="badge badge-featured">★ Featured</span>
+                                    {% else %}
+                                        <span class="badge badge-hidden">—</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    {% if request.user.is_superuser %}
+                                        <a href="{% url 'portfolio:brand_edit' brand.pk %}" class="btn-edit">Edit</a>
+                                        <form method="post" action="{% url 'portfolio:brand_delete' brand.pk %}" style="display: inline;" onsubmit="return confirm('Confirm delete?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge badge-hidden">Read only</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-state"><p>No brands added yet.</p></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="works" class="tab-content">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Case Studies</h3>
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'portfolio:casestudy_create' %}" class="btn-add">+ Add Work</a>
+                {% endif %}
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Project Title</th>
+                            <th>Brand</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for work in works %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ work.title }}</td>
+                                <td>{{ work.brand.name }}</td>
+                                <td>
+                                    {% if work.is_published %}
+                                        <span class="badge badge-published">✓ Published</span>
+                                    {% else %}
+                                        <span class="badge badge-hidden">Hidden</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    {% if request.user.is_superuser %}
+                                        <a href="{% url 'portfolio:casestudy_edit' work.pk %}" class="btn-edit">Edit</a>
+                                        <form method="post" action="{% url 'portfolio:casestudy_delete' work.pk %}" style="display: inline;" onsubmit="return confirm('Confirm delete?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">Delete</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge badge-hidden">Read only</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-state"><p>No works added yet.</p></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if request.user.is_superuser and registered_users %}
+    <div id="users" class="tab-content">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Ro'yxatdan o'tgan foydalanuvchilar</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Foydalanuvchi nomi</th>
+                            <th>Email</th>
+                            <th>Qo'shilgan sana</th>
+                            <th style="text-align: right;">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in registered_users %}
+                            <tr>
+                                <td style="font-weight: 600;">
+                                    {{ u.username }}
+                                    {% if u.is_superuser %}
+                                        <span class="badge badge-featured" style="margin-left: 5px;">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ u.email|default:"—" }}</td>
+                                <td style="font-size: 0.9rem; color: #A1A1AA;">{{ u.date_joined|date:"d.m.Y H:i" }}</td>
+                                <td style="text-align: right;">
+                                    {% if not u.is_superuser and u != request.user %}
+                                        <form method="post" action="{% url 'portfolio:user_toggle_active' u.pk %}" style="display: inline;"
+                                              class="toggle-active-form" data-username="{{ u.username }}" data-active="{{ u.is_active|yesno:'true,false' }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="reason" class="reason-input">
+                                            <button type="submit" class="btn-edit">
+                                                {% if u.is_active %}Bloklash{% else %}Blokdan chiqarish{% endif %}
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'portfolio:user_delete' u.pk %}" style="display: inline;"
+                                              onsubmit="return confirm('\'{{ u.username }}\' foydalanuvchisini o\'chirishni istaysizmi?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">O'chirish</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge badge-hidden">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(event, tabName) {
+        event.preventDefault();
+
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active'); // e.target'dan e.currentTarget'ga o'zgartirildi (ichidagi belgi bosilsa ham ishlasin)
+
+        localStorage.setItem('active_dashboard_tab', tabName);
+    }
+
+    const savedTab = localStorage.getItem('active_dashboard_tab') || 'profile';
+    const tabButton = document.querySelector(`[onclick*="'${savedTab}'"]`);
+    if (tabButton) {
+        tabButton.click();
+    }
+
+    // ─── Foydalanuvchini bloklash / blokdan chiqarish ───
+    document.querySelectorAll('.toggle-active-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            const isActive = this.dataset.active === 'true';
+            const username = this.dataset.username;
+
+            if (isActive) {
+                const reason = prompt(`'${username}' foydalanuvchisini bloklash sababini kiriting:`);
+                if (reason === null) {
+                    e.preventDefault();
+                    return;
+                }
+                this.querySelector('.reason-input').value = reason;
+            } else {
+                if (!confirm(`'${username}' foydalanuvchisini blokdan chiqarishni istaysizmi?`)) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

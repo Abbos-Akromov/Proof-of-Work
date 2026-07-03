@@ -1,0 +1,251 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Register — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+    }
+    
+    .auth-card {
+        background: rgba(39, 39, 42, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        padding: 2.5rem;
+    }
+    
+    body.light .auth-card {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .auth-subtitle {
+        text-align: center;
+        color: #A1A1AA;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    body.light .auth-subtitle {
+        color: #71717A;
+    }
+    
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .form-field label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #E4E4E7;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    body.light .form-field label {
+        color: #18181B;
+    }
+    
+    .form-field input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(39, 39, 42, 0.8);
+        color: #E4E4E7;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .password-field {
+        position: relative;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: #E4E4E7;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0;
+    }
+    .password-field input {
+        padding-right: 3rem;
+    }
+    
+    body.light .form-field input {
+        background: rgba(244, 244, 245, 0.8);
+        color: #18181B;
+    }
+    
+    .form-field input:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-field input::placeholder {
+        color: #71717A;
+    }
+    
+    .error-message {
+        color: #EF4444;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .help-text {
+        color: #71717A;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .auth-button {
+        width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+    
+    .auth-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    .auth-button:active {
+        transform: translateY(0);
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(113, 113, 122, 0.2);
+    }
+    
+    body.light .auth-links {
+        border-top-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .auth-links p {
+        color: #A1A1AA;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    body.light .auth-links p {
+        color: #71717A;
+    }
+    
+    .auth-links a {
+        color: #D4AF37;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-links a:hover {
+        color: #E9C85F;
+    }
+    
+    .warning-banner {
+        background: rgba(240, 167, 11, 0.1);
+        border: 1px solid rgba(240, 167, 11, 0.3);
+        border-left: 3px solid #F59E0B;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #FCD34D;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">PoW</h1>
+        <p class="auth-subtitle">Ro'yxatdan o'tish — Yangi portfoliyo ochish</p>
+        
+        {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for message in messages %}
+                    <div style="padding: 0.875rem; border-radius: 0.5rem; border-left: 3px solid; margin-bottom: 0.75rem; font-size: 0.9rem; {% if 'success' in message.tags %}background: rgba(16, 185, 129, 0.1); border-left-color: #10B981; color: #10B981;{% elif 'error' in message.tags %}background: rgba(239, 68, 68, 0.1); border-left-color: #EF4444; color: #EF4444;{% else %}background: rgba(59, 130, 246, 0.1); border-left-color: #3B82F6; color: #93C5FD;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="warning-banner">
+            ⚠️ Faqat bir ta hisobingiz bo'lishi mumkin. Ro'yxatdan o'tishdan keyin loginni o'zgartirilmaydi.
+        </div>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% if is_verification_step %}
+                <p class="help-text">Emailga 6 raqamli kod yuborildi: <strong>{{ verification_email }}</strong></p>
+                <div class="form-field">
+                    <label for="verification_code">6 raqamli tasdiqlash kodi</label>
+                    <input type="text" id="verification_code" name="verification_code" maxlength="6" minlength="6" placeholder="123456" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" required>
+                </div>
+                <button type="submit" class="auth-button">Kodni Tekshirish</button>
+                <button type="submit" name="resend_code" value="1" class="auth-button" style="background: #6B7280;">Kodni Qayta Yuborish</button>
+            {% else %}
+                {% for field in form %}
+                    <div class="form-field {% if field.name == 'password1' or field.name == 'password2' %}password-field{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <span class="help-text">{{ field.help_text|safe }}</span>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                        {% if field.name == 'password1' or field.name == 'password2' %}
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('{{ field.auto_id }}')">👁</button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="auth-button">Hisobni Ochish</button>
+            {% endif %}
+        </form>
+
+        <div class="auth-links">
+            <p>Hisobingiz bormi? <a href="{% url 'portfolio:custom_login' %}">Kirish</a></p>
+        </div>
+        <script>
+            function togglePasswordVisibility(fieldId) {
+                const input = document.getElementById(fieldId);
+                if (!input) return;
+                input.type = input.type === 'password' ? 'text' : 'password';
+            }
+        </script>
+    </div>
+</div>
+
+{% endblock %}

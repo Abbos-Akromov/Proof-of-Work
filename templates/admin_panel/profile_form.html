@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoW — Profil tahrirlash</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+<aside class="sidebar">
+  <div class="sidebar-logo"><span class="logo-p">P</span><span class="logo-o">o</span><span class="logo-w">W</span></div>
+  <nav class="sidebar-nav">
+    <a href="{% url 'admin_dashboard' %}" class="sidebar-link">← Dashboard</a>
+  </nav>
+</aside>
+<main class="dash-main">
+  <header class="dash-header"><h1 class="dash-title">Profilni tahrirlash</h1></header>
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data" class="pow-form">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span class="field-hint">{{ field.help_text }}</span>{% endif %}
+        {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+      </div>
+      {% endfor %}
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Saqlash</button>
+        <a href="{% url 'admin_dashboard' %}" class="btn-ghost">Bekor qilish</a>
+      </div>
+    </form>
+  </div>
+</main>
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}Brandlar — PoW{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Page Hero ─── */
+    .page-hero {
+        padding: 5rem 0;
+        border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+        background: rgba(24, 24, 27, 0.3);
+    }
+    
+    body.light .page-hero {
+        border-bottom-color: rgba(161, 161, 170, 0.2);
+        background: rgba(244, 244, 245, 0.3);
+    }
+    
+    .page-subtitle {
+        color: #A1A1AA;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+    
+    body.light .page-subtitle {
+        color: #71717A;
+    }
+    
+    /* ─── Brands List Container ─── */
+    .brands-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+    }
+    
+    /* ─── Individual Brand Block ─── */
+    .brand-block {
+        background: rgba(39, 39, 42, 0.3);
+        border: 1px solid rgba(113, 113, 122, 0.15);
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .brand-block {
+        background: rgba(244, 244, 245, 0.3);
+        border-color: rgba(161, 161, 170, 0.15);
+    }
+    
+    .brand-block:hover {
+        border-color: rgba(212, 175, 55, 0.2);
+        background: rgba(39, 39, 42, 0.5);
+    }
+    
+    body.light .brand-block:hover {
+        background: rgba(244, 244, 245, 0.5);
+    }
+    
+    /* ─── Brand Header (Logo + Name + Meta) ─── */
+    .brand-header {
+        display: flex;
+        gap: 2.5rem;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 640px) {
+        .brand-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    }
+
+    .brand-split {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .brand-left {
+        flex: 1 1 58%;
+        min-width: 0;
+    }
+
+    .brand-right {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        margin-left: auto;
+    }
+
+    .brand-video-box {
+        width: 100%;
+        max-width: 400px;
+        max-height: 250px;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: transparent;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .brand-media-player {
+        width: 100%;
+        max-height: 250px;
+        object-fit: contain;
+        display: block;
+        background: transparent;
+    }
+
+    @media (min-width: 768px) {
+        .brand-split {
+            flex-direction: row;
+            align-items: stretch;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .brand-right {
+            justify-content: stretch;
+        }
+    }
+
+    /* ─── Brand Logo Wrapper ─── */
+    .brand-logo-wrap {
+        flex-shrink: 0;
+        width: 140px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(24, 24, 27, 0.5);
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .brand-logo-wrap {
+        background: rgba(244, 244, 245, 0.5);
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .brand-logo-wrap:hover {
+        border-color: rgba(212, 175, 55, 0.4);
+        transform: scale(1.02);
+    }
+    
+    .brand-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        padding: 1rem;
+    }
+    
+    .brand-logo-placeholder {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #D4AF37;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    /* ─── Brand Meta (Name + Label + Category) ─── */
+    .brand-meta {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .brand-name {
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+    }
+    
+    body.light .brand-name {
+        color: #18181B;
+    }
+    
+    .brand-name-top {
+        font-size: 1.875rem;
+        font-weight: 700;
+        font-family: 'Playfair Display', serif;
+        color: #E4E4E7;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    body.light .brand-name-top {
+        color: #18181B;
+    }
+    
+    .brand-work-label {
+        display: inline-block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 0.4rem 1rem;
+        border-radius: 0.5rem;
+        margin-right: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .brand-category-badge {
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #71717A;
+        background: rgba(113, 113, 122, 0.1);
+        padding: 0.4rem 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    body.light .brand-category-badge {
+        color: #A1A1AA;
+    }
+    
+    /* ─── Brand Description ─── */
+    .brand-description {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #A1A1AA;
+        margin-bottom: 2.5rem;
+    }
+    
+    body.light .brand-description {
+        color: #71717A;
+    }
+    
+    /* ─── Video Container Fix ─── */
+    .video-container {
+        margin: 2rem 0;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(113, 113, 122, 0.2);
+        background: #000;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        max-width: 100%;
+    }
+    
+    body.light .video-container {
+        border-color: rgba(161, 161, 170, 0.2);
+    }
+    
+    .video-container video {
+        width: 100% !important;
+        height: auto !important;
+        display: block;
+        background: #000;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+    }
+    
+    /* ─── Case Studies Grid ─── */
+    .case-studies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    @media (max-width: 640px) {
+        .case-studies-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .cs-card {
+        group relative overflow-hidden border-radius: 0.875rem;
+        border: 1px solid rgba(113, 113, 122, 0.15);
+        background: rgba(39, 39, 42, 0.4);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    body.light .cs-card {
+        background: rgba(244, 244, 245, 0.4);
+        border-color: rgba(161, 161, 170, 0.15);
+    }
+    
+    .cs-card:hover {
+        border-color: rgba(212, 175, 55, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(212, 175, 55, 0.15);
+    }
+    
+    .cs-thumb {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .cs-thumb-empty {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #D4AF37;
+    }
+    
+    .cs-body {
+        padding: 1.25rem;
+    }
+    
+    .cs-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #E4E4E7;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    body.light .cs-title {
+        color: #18181B;
+    }
+    
+    .cs-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    /* ─── Brand Site Link ─── */
+    .brand-site-link {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.875rem 1.75rem;
+        background: linear-gradient(135deg, #D4AF37, #E9C85F);
+        color: #09090B;
+        text-decoration: none;
+        border-radius: 0.625rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .brand-site-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* ─── Empty State ─── */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #71717A;
+        font-size: 1rem;
+    }
+    
+    body.light .empty-state {
+        color: #A1A1AA;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section page-hero reveal">
+  <div class="container">
+    <span class="section-label">Mijozlar</span>
+    <h1 class="section-title">Brandlar va hamkorliklar</h1>
+    <p class="page-subtitle">Har bir brand yonida ularga qilingan aniq ish ko'rsatilgan.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="brands-list">
+      {% for brand in brands %}
+      <div class="brand-block reveal">
+        <a href="{% url 'portfolio:brand_detail' brand.pk %}" class="brand-link-block reveal" aria-label="{{ brand.name }} sahifasiga o'tish">
+          <div class="brand-name-top">{{ brand.name }}</div>
+        </a>
+        
+        <div class="brand-header">
+          <a href="{% url 'portfolio:brand_detail' brand.pk %}" class="brand-logo-wrap-link reveal-logo">
+            <div class="brand-logo-wrap">
+              {% if brand.logo %}
+                <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">
+              {% else %}
+                <div class="brand-logo-placeholder">{{ brand.name|first }}</div>
+              {% endif %}
+            </div>
+          </a>
+          
+          <div class="brand-meta">
+            <span class="brand-work-label">{{ brand.work_label }}</span>
+            <span class="brand-category-badge">{{ brand.get_category_display }}</span>
+          </div>
+        </div>
+
+        <div class="brand-split flex flex-col md:flex-row">
+          <div class="brand-left">
+            {% if brand.description %}
+              <p class="brand-description">{{ brand.description }}</p>
+            {% endif %}
+            
+            {% if brand.website %}
+              <a href="{{ brand.website }}" class="brand-site-link" target="_blank" rel="noopener">
+                Saytga o'tish ↗
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="brand-right">
+            {% if brand.latest_video %}
+              <div class="brand-video-box">
+                <video preload="metadata" controls playsinline class="brand-media-player">
+                  <source src="{{ brand.latest_video.video.url }}" type="video/mp4">
+                  Sizning brauzeringiz videoni qo'llab-quvvatlamaydi.
+                </video>
+              </div>
+            {% else %}
+              <div class="brand-video-box" style="display: flex; align-items: center; justify-content: center; color: #D4AF37;">
+                <span>Video mavjud emas</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if brand.case_studies.all %}
+        <div class="case-studies-grid">
+          {% for cs in brand.case_studies.all %}
+          {% if cs.is_published %}
+          <a href="{% url 'portfolio:case_study_detail' cs.pk %}" class="cs-card reveal">
+            {% if cs.thumbnail %}
+              <img src="{{ cs.thumbnail.url }}" alt="{{ cs.title }}" class="cs-thumb" loading="lazy">
+            {% else %}
+              <div class="cs-thumb cs-thumb-empty">▶</div>
+            {% endif %}
+            <div class="cs-body">
+              <h3 class="cs-title">{{ cs.title }}</h3>
+              <div class="cs-tags">
+                {% for tag in cs.get_tags_list %}
+                  <span class="tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <p>Hozircha brandlar qo'shilmagan.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
